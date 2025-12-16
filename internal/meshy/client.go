@@ -10,43 +10,35 @@ import (
 
 // This is the Meshy Client which knows how to make the POST and GET
 
-const Meshy_API_URL string = "https://api.meshy.ai/v2/text-to-3d"
-
 type Client struct {
-	APIKey string
+	APIKey  string
+	BaseURL string
+	http    *http.Client
 }
 
-func (c *Client) getJobStatus(jobID string) (*JobStatusResponse, error) {
-	url := Meshy_API_URL + jobID
-
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", "Bearer "+c.APIKey)
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	var data JobStatusResponse
-	if err := json.NewDecoder(res.Body).Decode(&data); err != nil {
-		return nil, err
-	}
-
-	return &data, nil
+func NewClient(apiKey string, baseURL string) *Client {
+	return &Client{APIKey: apiKey, BaseURL: baseURL, http: &http.Client{}}
 }
 
-func NewClient(apiKey string) *Client {
-	return &Client{APIKey: apiKey}
+func (c *Client) CreateGenerationJob(req *TextTo3DRequest) (*MeshyResponse, error) {
+	url := c.BaseURL + "/text-to-3d"
+	return c.CreateJob(url, req)
 }
 
-func (c *Client) CreateGenerationJob(req *TextTo3DRequest) (*TextTo3DResponse, error) {
-	body, _ := json.Marshal(req)
+func (c *Client) CreateRefineJob(previewID string) (*MeshyResponse, error) {
+	url := c.BaseURL + "/text-to-3d"
+	req := map[string]string{
+		"mode":            "refine",
+		"preview_task_id": previewID,
+	}
+	return c.CreateJob(url, req)
+}
+
+func (c *Client) CreateJob(url string, payload any) (*MeshyResponse, error) {
+	body, _ := json.Marshal(payload)
 	fmt.Println("JSON SENT TO MESHY:", string(body))
 
-	httpReq, _ := http.NewRequest("POST", Meshy_API_URL, bytes.NewBuffer(body))
+	httpReq, _ := http.NewRequest("POST", url, bytes.NewBuffer(body))
 	httpReq.Header.Set("Authorization", "Bearer "+c.APIKey)
 	httpReq.Header.Set("Content-Type", "application/json")
 
@@ -60,10 +52,34 @@ func (c *Client) CreateGenerationJob(req *TextTo3DRequest) (*TextTo3DResponse, e
 	raw, _ := io.ReadAll(res.Body)
 	fmt.Println("RAW RESPONSE:", string(raw))
 
-	var data TextTo3DResponse
-	if err := json.NewDecoder(res.Body).Decode(&data); err != nil {
+	var data MeshyResponse
+	if err := json.Unmarshal(raw, &data); err != nil {
 		return nil, err
 	}
 
 	return &data, nil
+}
+
+func (c *Client) getTaskStatus(taskID string) (*MeshyTaskStatus, error) {
+	url := c.BaseURL + "/text-to-3d/" + taskID
+
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Set("Authorization", "Bearer "+c.APIKey)
+
+	res, err := c.http.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+
+	raw, _ := io.ReadAll(res.Body)
+	fmt.Println("TASK STATUS RAW: ", string(raw))
+
+	var status MeshyTaskStatus
+	if err := json.Unmarshal(raw, &status); err != nil {
+		return nil, err
+	}
+
+	return &status, nil
 }

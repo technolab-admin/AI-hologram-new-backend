@@ -2,6 +2,7 @@ package meshy
 
 import (
 	"errors"
+	"fmt"
 	"time"
 )
 
@@ -15,24 +16,51 @@ func NewService(client *Client) *Service {
 	return &Service{client: client}
 }
 
-func (s *Service) Generate(req *TextTo3DRequest) (string, error) {
+func (s *Service) GenerateAndRefine(req *TextTo3DRequest) (string, error) {
 
-	// Create Job
-	res, err := s.client.CreateGenerationJob(req)
+	// Generate Preview Model
+	previewRes, err := s.client.CreateGenerationJob(req)
 	if err != nil {
 		return "", err
 	}
 
-	// Poll Job Status (Websockets)
+	previewTaskID := previewRes.ResultID
+	fmt.Println("Preview Task ID:" + previewTaskID)
 
+	if err := s.waitUntilSucceeded(previewTaskID); err != nil {
+		return "", err
+	}
+
+	// Generate Refined Model
+	refineRes, err := s.client.CreateRefineJob(previewTaskID)
+	if err != nil {
+		return "", err
+	}
+
+	refineID := refineRes.ResultID
+
+	if err := s.waitUntilSucceeded(refineID); err != nil {
+		return "", err
+	}
+
+	return refineRes.ResultID, nil
+}
+
+func (s *Service) waitUntilSucceeded(taskID string) error {
 	for {
-		status, _ := s.client.getJobStatus(res.JobID)
-		if status.Status == "SUCCEEDED" {
-			return status.ModelURL, nil
+		status, err := s.client.getTaskStatus(taskID)
+		if err != nil {
+			return err
 		}
-		if status.Status == "FAILED" {
-			return "", errors.New("MeshyAI generation failed")
+
+		switch status.Status {
+		case "SUCCEEDED":
+			return nil
+		case "FAILED":
+			return errors.New("meshy task failed")
 		}
+
 		time.Sleep(2 * time.Second)
+
 	}
 }

@@ -7,13 +7,13 @@ type TextTo3DRequest struct {
 	Prompt       string `json:"prompt"`
 	ShouldRemesh bool   `json:"shouldRemesh"`
 }
-type TextTo3DResponse struct {
-	JobID string `json:"job_id"`
+
+type MeshyResponse struct {
+	ResultID string `json:"result"`
 }
 
-type JobStatusResponse struct {
+type MeshyTaskStatus struct {
 	Status   string `json:"status"`
-	Progress int    `json:progress`
+	Progress int    `json:"progress"`
 	ModelURL string `json:"model_url"`
-	Error    string `json:error,omitempty`
 }

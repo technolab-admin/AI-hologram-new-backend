@@ -26,7 +26,7 @@ func (h *MeshyHandler) Generate(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("REQUEST: %+v\n", req) // debug
 
-	url, err := h.service.Generate(&req)
+	url, err := h.service.GenerateAndRefine(&req)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

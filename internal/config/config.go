@@ -7,16 +7,18 @@ import (
 )
 
 type Config struct {
-	ServerAddr  string
-	MeshyAPIKey string
+	ServerAddr     string
+	MeshyAPIKey    string
+	MeshyAPIAdress string
 }
 
 func Load() (*Config, error) {
 	godotenv.Load(".env")
 
 	return &Config{
-		ServerAddr:  getEnv("SERVER_ADDR", ":8080"),
-		MeshyAPIKey: os.Getenv("MESHY_API_KEY"),
+		ServerAddr:     getEnv("SERVER_ADDR", ":8080"),
+		MeshyAPIKey:    os.Getenv("MESHY_API_KEY"),
+		MeshyAPIAdress: os.Getenv("MESHY_API_BASE_URL"),
 	}, nil
 }
 

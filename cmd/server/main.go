@@ -1,6 +1,7 @@
 package main
 
-// This is where the request enters the backend
+// This is where the server gets started up
+
 import (
 	"log"
 	"net/http"

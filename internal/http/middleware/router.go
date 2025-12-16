@@ -20,7 +20,7 @@ func NewRouter(cfg *config.Config) http.Handler {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.AllowContentType("application/json"))
 
-	client := meshy.NewClient(cfg.MeshyAPIKey)
+	client := meshy.NewClient(cfg.MeshyAPIKey, cfg.MeshyAPIAdress)
 	service := meshy.NewService(client)
 	handler := handlers.NewMeshyHandler(service)
 

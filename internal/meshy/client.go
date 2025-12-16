@@ -36,7 +36,7 @@ func (c *Client) CreateRefineJob(previewID string) (*MeshyResponse, error) {
 
 func (c *Client) CreateJob(url string, payload any) (*MeshyResponse, error) {
 	body, _ := json.Marshal(payload)
-	fmt.Println("JSON SENT TO MESHY:", string(body))
+	fmt.Println("JSON SENT TO MESHY:", string(body)) // debug
 
 	httpReq, _ := http.NewRequest("POST", url, bytes.NewBuffer(body))
 	httpReq.Header.Set("Authorization", "Bearer "+c.APIKey)
@@ -50,7 +50,7 @@ func (c *Client) CreateJob(url string, payload any) (*MeshyResponse, error) {
 	defer res.Body.Close()
 
 	raw, _ := io.ReadAll(res.Body)
-	fmt.Println("RAW RESPONSE:", string(raw))
+	fmt.Println("RAW RESPONSE:", string(raw)) // debug
 
 	var data MeshyResponse
 	if err := json.Unmarshal(raw, &data); err != nil {
@@ -74,7 +74,7 @@ func (c *Client) getTaskStatus(taskID string) (*MeshyTaskStatus, error) {
 	defer res.Body.Close()
 
 	raw, _ := io.ReadAll(res.Body)
-	fmt.Println("TASK STATUS RAW: ", string(raw))
+	fmt.Println("TASK STATUS RAW: ", string(raw)) // debug
 
 	var status MeshyTaskStatus
 	if err := json.Unmarshal(raw, &status); err != nil {

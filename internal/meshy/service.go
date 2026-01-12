@@ -16,7 +16,7 @@ func NewService(client *Client) *Service {
 	return &Service{client: client}
 }
 
-func (s *Service) GenerateAndRefine(req *TextTo3DRequest) (string, error) {
+func (s *Service) GeneratePreview(req *TextTo3DRequest) (string, error) {
 
 	// Generate Preview Model
 	previewRes, err := s.client.CreateGenerationJob(req)
@@ -31,7 +31,11 @@ func (s *Service) GenerateAndRefine(req *TextTo3DRequest) (string, error) {
 		return "", err
 	}
 
-	// Generate Refined Model
+	return previewRes.ResultID, nil
+}
+
+func (s *Service) GenerateRefine(previewTaskID string) (string, error) {
+
 	refineRes, err := s.client.CreateRefineJob(previewTaskID)
 	if err != nil {
 		return "", err

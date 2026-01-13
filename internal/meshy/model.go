@@ -13,7 +13,8 @@ type MeshyResponse struct {
 }
 
 type MeshyTaskStatus struct {
-	Status   string `json:"status"`
-	Progress int    `json:"progress"`
-	ModelURL string `json:"model_url"`
+	Status   	string `json:"status"`
+	Progress 	int    `json:"progress"`
+	Mode 		string `json:"mode"`
+	ModelURLS 	map[string]string `json:"model_urls"`
 }

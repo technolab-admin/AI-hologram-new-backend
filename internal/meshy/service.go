@@ -5,16 +5,23 @@ import (
 	"fmt"
 	"path/filepath"
 	"time"
+	"log"
+	// "encoding/json"
 )
 
 // This is the service file that handles stream parsing and emits the events
 
 type Service struct {
 	client *Client
+	wsClient *WSClient
 }
 
-func NewService(client *Client) *Service {
-	return &Service{client: client}
+func NewService(client *Client, wsClient *WSClient) *Service {
+
+	return &Service{
+		client: client, 
+		wsClient: wsClient,
+	}
 }
 
 func (s *Service) GeneratePreview(req *TextTo3DRequest) (string, error) {
@@ -63,14 +70,34 @@ func (s *Service) GenerateRefine(previewTaskID string) (string, error) {
 
 func (s *Service) waitUntilSucceeded(taskID string) error {
 	for {
-		status, err := s.client.getTaskStatus(taskID)
+		status, raw, err := s.client.getTaskStatus(taskID)
 		if err != nil {
 			return err
 		}
 
 		switch status.Status {
+
 		case "SUCCEEDED":
+
+			log.Printf("Meshy task %v succeeded", taskID)
+
+			modelName, err := download_model(raw)
+			if err != nil {
+				return err
+			}
+
+			err = s.wsClient.notifyFrontend(map[string]string{
+				"from": 	"backend-meshy",
+				"target":  	"frontend-three",
+				"event":  	"new_model",
+				"data":		modelName,
+			})
+			if err != nil {
+				return err
+			}
+
 			return nil
+
 		case "FAILED":
 			return errors.New("meshy task failed")
 		}

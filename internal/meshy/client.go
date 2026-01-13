@@ -60,7 +60,7 @@ func (c *Client) CreateJob(url string, payload any) (*MeshyResponse, error) {
 	return &data, nil
 }
 
-func (c *Client) getTaskStatus(taskID string) (*MeshyTaskStatus, error) {
+func (c *Client) getTaskStatus(taskID string) (*MeshyTaskStatus, []byte, error) {
 	url := c.BaseURL + "/text-to-3d/" + taskID
 
 	req, _ := http.NewRequest("GET", url, nil)
@@ -68,7 +68,7 @@ func (c *Client) getTaskStatus(taskID string) (*MeshyTaskStatus, error) {
 
 	res, err := c.http.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	defer res.Body.Close()
@@ -77,7 +77,7 @@ func (c *Client) getTaskStatus(taskID string) (*MeshyTaskStatus, error) {
 
 	var status MeshyTaskStatus
 	if err := json.Unmarshal(raw, &status); err != nil {
-		return nil, err
+		return nil, raw, err
 	}
 
 	fmt.Println("TASK PROGRESS: ", status.Progress)

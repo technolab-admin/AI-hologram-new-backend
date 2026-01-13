@@ -12,13 +12,17 @@ import (
 
 // This file sets up the HTTP and websocket routes
 
-func NewRouter(cfg *config.Config) http.Handler {
+func NewRouter(cfg *config.Config, wsClient *meshy.WSClient) http.Handler {
+	
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.AllowContentType("application/json"))
+
+	r.Use(handlers.CORSMiddleware)
+	
 
 	client := meshy.NewClient(cfg.MeshyAPIKey, cfg.MeshyAPIAdress)
 	service := meshy.NewService(client)
@@ -28,8 +32,8 @@ func NewRouter(cfg *config.Config) http.Handler {
 		r.Post("/generate", handler.Generate)
 	})
 
-	fileServer := http.FileServer(http.Dir("./assets"))
-	r.Handle("/assets/*", http.StripPrefix("/assets", fileServer))
+	fileServer := http.FileServer(http.Dir("./assets/downloads"))
+    r.Handle("/assets/downloads/*", http.StripPrefix("/assets/downloads", fileServer))
 
 	return r
 }

@@ -10,6 +10,7 @@ type Config struct {
 	ServerAddr     string
 	MeshyAPIKey    string
 	MeshyAPIAdress string
+	PublicBaseUrl  string
 }
 
 func Load() (*Config, error) {
@@ -19,6 +20,7 @@ func Load() (*Config, error) {
 		ServerAddr:     getEnv("SERVER_ADDR", ":8080"),
 		MeshyAPIKey:    os.Getenv("MESHY_API_KEY"),
 		MeshyAPIAdress: os.Getenv("MESHY_API_BASE_URL"),
+		PublicBaseUrl:  os.Getenv("PUBLIC_BASE_URL"),
 	}, nil
 }
 

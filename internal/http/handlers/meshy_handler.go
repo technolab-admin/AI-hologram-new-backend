@@ -1,18 +1,21 @@
 package handlers
 
 import (
+	"AI-HOLOGRAM-NEW-BACKEND/internal/config"
 	"AI-HOLOGRAM-NEW-BACKEND/internal/logger"
 	"AI-HOLOGRAM-NEW-BACKEND/internal/meshy"
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
 type MeshyHandler struct {
 	service *meshy.Service
+	cfg     *config.Config
 }
 
-func NewMeshyHandler(s *meshy.Service) *MeshyHandler {
-	return &MeshyHandler{service: s}
+func NewMeshyHandler(s *meshy.Service, c *config.Config) *MeshyHandler {
+	return &MeshyHandler{service: s, cfg: c}
 }
 
 func (h *MeshyHandler) Generate(w http.ResponseWriter, r *http.Request) {
@@ -32,7 +35,7 @@ func (h *MeshyHandler) Generate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	refineUrl, err := h.service.GenerateRefine(previewID)
+	refineName, err := h.service.GenerateRefine(previewID)
 
 	if err != nil {
 		logger.Error.Printf("refine generation failed: %v", err)
@@ -40,10 +43,10 @@ func (h *MeshyHandler) Generate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logger.Info.Printf("generation succeeded: model_url=%s", refineUrl)
+	logger.Info.Printf("generation succeeded: model_url=%s", refineName)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
-		"model_url": refineUrl,
+		"model_url": fmt.Sprintf("%s/assets/downloads/%s", h.cfg.PublicBaseUrl, refineName),
 	})
 }

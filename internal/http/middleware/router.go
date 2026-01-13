@@ -22,11 +22,14 @@ func NewRouter(cfg *config.Config) http.Handler {
 
 	client := meshy.NewClient(cfg.MeshyAPIKey, cfg.MeshyAPIAdress)
 	service := meshy.NewService(client)
-	handler := handlers.NewMeshyHandler(service)
+	handler := handlers.NewMeshyHandler(service, cfg)
 
 	r.Route("/meshy", func(r chi.Router) {
 		r.Post("/generate", handler.Generate)
 	})
+
+	fileServer := http.FileServer(http.Dir("./assets"))
+	r.Handle("/assets/*", http.StripPrefix("/assets", fileServer))
 
 	return r
 }

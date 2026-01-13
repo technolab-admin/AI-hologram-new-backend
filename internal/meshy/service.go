@@ -3,6 +3,7 @@ package meshy
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 	"time"
 )
 
@@ -47,7 +48,17 @@ func (s *Service) GenerateRefine(previewTaskID string) (string, error) {
 		return "", err
 	}
 
-	return refineRes.ResultID, nil
+	filename := fmt.Sprintf("%s.glb", refineID)
+	path := filepath.Join("assets", "downloads", filename)
+
+	// err := downloadFile(modelURL, path)
+	// if err != nil {
+	// 	return "", err
+	// }
+
+	fmt.Println(path) // debug
+
+	return filename, nil
 }
 
 func (s *Service) waitUntilSucceeded(taskID string) error {

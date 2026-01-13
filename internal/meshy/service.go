@@ -3,6 +3,7 @@ package meshy
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 	"time"
 	"log"
 	// "encoding/json"
@@ -23,7 +24,7 @@ func NewService(client *Client, wsClient *WSClient) *Service {
 	}
 }
 
-func (s *Service) GenerateAndRefine(req *TextTo3DRequest) (string, error) {
+func (s *Service) GeneratePreview(req *TextTo3DRequest) (string, error) {
 
 	// Generate Preview Model
 	previewRes, err := s.client.CreateGenerationJob(req)
@@ -38,7 +39,11 @@ func (s *Service) GenerateAndRefine(req *TextTo3DRequest) (string, error) {
 		return "", err
 	}
 
-	// Generate Refined Model
+	return previewRes.ResultID, nil
+}
+
+func (s *Service) GenerateRefine(previewTaskID string) (string, error) {
+
 	refineRes, err := s.client.CreateRefineJob(previewTaskID)
 	if err != nil {
 		return "", err
@@ -50,7 +55,17 @@ func (s *Service) GenerateAndRefine(req *TextTo3DRequest) (string, error) {
 		return "", err
 	}
 
-	return refineRes.ResultID, nil
+	filename := fmt.Sprintf("%s.glb", refineID)
+	path := filepath.Join("assets", "downloads", filename)
+
+	// err := downloadFile(modelURL, path)
+	// if err != nil {
+	// 	return "", err
+	// }
+
+	fmt.Println(path) // debug
+
+	return filename, nil
 }
 
 func (s *Service) waitUntilSucceeded(taskID string) error {

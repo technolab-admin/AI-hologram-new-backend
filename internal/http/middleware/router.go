@@ -25,8 +25,8 @@ func NewRouter(cfg *config.Config, wsClient *meshy.WSClient) http.Handler {
 	
 
 	client := meshy.NewClient(cfg.MeshyAPIKey, cfg.MeshyAPIAdress)
-	service := meshy.NewService(client, wsClient)
-	handler := handlers.NewMeshyHandler(service)
+	service := meshy.NewService(client)
+	handler := handlers.NewMeshyHandler(service, cfg)
 
 	r.Route("/meshy", func(r chi.Router) {
 		r.Post("/generate", handler.Generate)

@@ -11,6 +11,7 @@ type Config struct {
 	WebsocketAddr  string
 	MeshyAPIKey    string
 	MeshyAPIAdress string
+	PublicBaseUrl  string
 }
 
 func Load() (*Config, error) {
@@ -21,6 +22,7 @@ func Load() (*Config, error) {
 		WebsocketAddr:  getEnv("WEBSOCKET_ADDR", ":8081"),
 		MeshyAPIKey:    os.Getenv("MESHY_API_KEY"),
 		MeshyAPIAdress: os.Getenv("MESHY_API_BASE_URL"),
+		PublicBaseUrl:  os.Getenv("PUBLIC_BASE_URL"),
 	}, nil
 }
 

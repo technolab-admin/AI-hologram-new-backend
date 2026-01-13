@@ -74,12 +74,13 @@ func (c *Client) getTaskStatus(taskID string) (*MeshyTaskStatus, []byte, error) 
 	defer res.Body.Close()
 
 	raw, _ := io.ReadAll(res.Body)
-	fmt.Println("TASK STATUS RAW: ", string(raw)) // debug
 
 	var status MeshyTaskStatus
 	if err := json.Unmarshal(raw, &status); err != nil {
 		return nil, raw, err
 	}
 
-	return &status, raw, nil
+	fmt.Println("TASK PROGRESS: ", status.Progress)
+
+	return &status, nil
 }

@@ -5,11 +5,12 @@ package main
 import (
 	"fmt"
 	"net/http"
-	
-	"AI-HOLOGRAM-NEW-BACKEND/internal/websockets"
+
 	"AI-HOLOGRAM-NEW-BACKEND/internal/config"
 	"AI-HOLOGRAM-NEW-BACKEND/internal/http/middleware"
 	"AI-HOLOGRAM-NEW-BACKEND/internal/logger"
+	"AI-HOLOGRAM-NEW-BACKEND/internal/meshy"
+	"AI-HOLOGRAM-NEW-BACKEND/internal/websockets"
 )
 
 func main() {
@@ -30,11 +31,9 @@ func run() error {
 	wsServer := websockets.NewServer(cfg.WebsocketAddr)
 	go wsServer.Start()
 
-
 	wsClient := meshy.NewWSClient("backend-meshy")
 	r := middleware.NewRouter(cfg, wsClient)
 	go wsClient.StartWebsocketClient()
-
 
 	logger.Info.Printf("Server running on %s", cfg.ServerAddr)
 	if err := http.ListenAndServe(cfg.ServerAddr, r); err != nil {

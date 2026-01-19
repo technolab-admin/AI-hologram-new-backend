@@ -1,15 +1,13 @@
 package websockets
 
-
 import (
-	"log"
 	"fmt"
+	"log"
 	"net/http"
 	"sync"
 
 	"github.com/gorilla/websocket"
 )
-
 
 type Server struct {
 	port     string
@@ -49,26 +47,26 @@ func (s *Server) messageHandler(clientId string) {
 
 		msg, err := UnmarshalMessage(rawJSON)
 		if err != nil {
-			log.Printf("Client %v Error: %v\n", clientId, err)
+			log.Printf("Client %v Error: %v\n", clientId, err) // Change to logger function
 			continue
 		}
 
 		if err = vallidateMsg(msg); err != nil {
-			log.Printf("Client %v Error: Validating message: %v\n", clientId, err)
+			log.Printf("Client %v Error: Validating message: %v\n", clientId, err) // Change to logger function
 			continue
 		}
 
 		targetId := msg["target"]
 		targetClient, targetIsActive := s.clients[targetId]
 		if !targetIsActive {
-			log.Printf("Client %v Error sending message to %v, target not connected\n", clientId, targetId)
+			log.Printf("Client %v Error sending message to %v, target not connected\n", clientId, targetId) // Change to logger function
 			continue
 		}
 
 		err = targetClient.conn.WriteMessage(websocket.TextMessage, rawJSON)
 
 		if err != nil {
-			log.Printf("Client %v Error sending message to %v, closing connection: %v\n", clientId, targetId, err)
+			log.Printf("Client %v Error sending message to %v, closing connection: %v\n", clientId, targetId, err) // Change to logger function
 
 			s.mutex.Lock()
 			targetClient.conn.Close()

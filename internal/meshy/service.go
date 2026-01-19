@@ -3,23 +3,22 @@ package meshy
 import (
 	"errors"
 	"fmt"
-	"path/filepath"
-	"time"
 	"log"
+	"time"
 	// "encoding/json"
 )
 
 // This is the service file that handles stream parsing and emits the events
 
 type Service struct {
-	client *Client
+	client   *Client
 	wsClient *WSClient
 }
 
 func NewService(client *Client, wsClient *WSClient) *Service {
 
 	return &Service{
-		client: client, 
+		client:   client,
 		wsClient: wsClient,
 	}
 }
@@ -56,14 +55,6 @@ func (s *Service) GenerateRefine(previewTaskID string) (string, error) {
 	}
 
 	filename := fmt.Sprintf("%s.glb", refineID)
-	path := filepath.Join("assets", "downloads", filename)
-
-	// err := downloadFile(modelURL, path)
-	// if err != nil {
-	// 	return "", err
-	// }
-
-	fmt.Println(path) // debug
 
 	return filename, nil
 }
@@ -79,7 +70,7 @@ func (s *Service) waitUntilSucceeded(taskID string) error {
 
 		case "SUCCEEDED":
 
-			log.Printf("Meshy task %v succeeded", taskID)
+			log.Printf("Meshy task %v succeeded", taskID) // Change to logger function
 
 			modelName, err := download_model(raw)
 			if err != nil {
@@ -87,10 +78,10 @@ func (s *Service) waitUntilSucceeded(taskID string) error {
 			}
 
 			err = s.wsClient.notifyFrontend(map[string]string{
-				"from": 	"backend-meshy",
-				"target":  	"frontend-three",
-				"event":  	"new_model",
-				"data":		modelName,
+				"from":   "backend-meshy",
+				"target": "frontend-three",
+				"event":  "new_model",
+				"data":   modelName,
 			})
 			if err != nil {
 				return err
@@ -99,7 +90,7 @@ func (s *Service) waitUntilSucceeded(taskID string) error {
 			return nil
 
 		case "FAILED":
-			return errors.New("meshy task failed")
+			return errors.New("meshy task failed") // Change to logger function
 		}
 
 		time.Sleep(2 * time.Second)

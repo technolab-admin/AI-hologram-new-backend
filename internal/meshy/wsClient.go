@@ -1,27 +1,24 @@
 package meshy
 
-
 import (
-	"github.com/gorilla/websocket"
 	"encoding/json"
-	"log"
 	"fmt"
+	"log"
+
+	"github.com/gorilla/websocket"
 
 	"AI-HOLOGRAM-NEW-BACKEND/internal/config"
 )
 
-
 type WSClient struct {
-	id string
+	id   string
 	send chan []byte
 	conn *websocket.Conn
 }
 
-
 func NewWSClient(id string) *WSClient {
-	return &WSClient{id: id, send: make(chan []byte, 16) }
+	return &WSClient{id: id, send: make(chan []byte, 16)}
 }
-
 
 func (wsc *WSClient) StartWebsocketClient() {
 
@@ -46,18 +43,18 @@ func (wsc *WSClient) StartWebsocketClient() {
 func (wsc *WSClient) frontendNotifier() {
 
 	for {
-		msg := <- wsc.send
+		msg := <-wsc.send
 
 		err := wsc.conn.WriteMessage(websocket.TextMessage, msg)
 		if err != nil {
 			wsc.conn.Close()
-			log.Printf("Error sending message: %v", err)
+			log.Printf("Error sending message: %v", err) // Change to logger function
 			return
 		}
 	}
 }
 
-func (wsc *WSClient) notifyFrontend(msg map[string]string) error{
+func (wsc *WSClient) notifyFrontend(msg map[string]string) error {
 
 	rawJSON, err := json.Marshal(msg)
 	if err != nil {

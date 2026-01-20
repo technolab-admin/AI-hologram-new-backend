@@ -62,8 +62,6 @@ func (jr *JobRunner) waitForTask(jobID, taskID string) error {
 
 		case "SUCCEEDED":
 
-			logger.Info.Println("Meshy task %v succeeded", taskID)
-
 			modelName, err := download_model(raw)
 			if err != nil {
 				return err

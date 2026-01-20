@@ -62,8 +62,6 @@ func (jr *JobRunner) waitForTask(jobID, taskID string) error {
 
 		case "SUCCEEDED":
 
-			logger.Info.Println("Meshy task %v succeeded", taskID)
-
 			modelName, err := download_model(raw)
 			if err != nil {
 				return err
@@ -87,7 +85,7 @@ func (jr *JobRunner) waitForTask(jobID, taskID string) error {
 func (jr *JobRunner) send(event, data string) {
 	_ = jr.wsClient.notifyFrontend(map[string]string{
 		"from":   "backend-meshy",
-		"target": "frontend-build",
+		"target": "frontend-three",
 		"event":  event,
 		"data":   data,
 	})

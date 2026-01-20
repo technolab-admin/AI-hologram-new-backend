@@ -20,7 +20,7 @@ func NewClient(apiKey string, baseURL string) *Client {
 	return &Client{APIKey: apiKey, BaseURL: baseURL, http: &http.Client{}}
 }
 
-func (c *Client) CreateGenerationJob(req *TextTo3DRequest) (*MeshyResponse, error) {
+func (c *Client) CreatePreviewJob(req *TextTo3DRequest) (*MeshyResponse, error) {
 	url := c.BaseURL + "/text-to-3d"
 	return c.CreateJob(url, req)
 }

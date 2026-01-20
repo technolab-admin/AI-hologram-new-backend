@@ -19,7 +19,7 @@ func NewJobRunner(client *Client, ws *WSClient) *JobRunner {
 func (jr *JobRunner) Run(jobID string, req *TextTo3DRequest) {
 
 	logger.Info.Println("job started: ", jobID)
-	jr.send("job started: ", jobID)
+	jr.send("frontend-build", "job started: ", jobID)
 
 	// 1. Create Preview
 	previewRes, err := jr.client.CreatePreviewJob(req)
@@ -69,7 +69,7 @@ func (jr *JobRunner) waitForTask(jobID, taskID string) error {
 				return err
 			}
 
-			jr.send("job:model_ready", modelName)
+			jr.send("frontend-three", "new_model", modelName)
 			return nil
 
 		case "FAILED":
@@ -77,17 +77,17 @@ func (jr *JobRunner) waitForTask(jobID, taskID string) error {
 			return domainErrors.ErrMeshyJobFailed
 
 		default:
-			jr.send("job:progress", strconv.Itoa(status.Progress))
+			jr.send("frontend-build", "progress", strconv.Itoa(status.Progress))
 		}
 
 		time.Sleep(2 * time.Second)
 	}
 }
 
-func (jr *JobRunner) send(event, data string) {
+func (jr *JobRunner) send(targetID string, event string, data string) {
 	_ = jr.wsClient.notifyFrontend(map[string]string{
 		"from":   "backend-meshy",
-		"target": "frontend-build",
+		"target": targetID,
 		"event":  event,
 		"data":   data,
 	})
@@ -96,11 +96,11 @@ func (jr *JobRunner) send(event, data string) {
 func (jr *JobRunner) fail(jobID string, err error) {
 	logger.Error.Println("job failed: ", jobID, err)
 
-	jr.send("job:error", err.Error())
+	jr.send("frontend-build", "job:error", err.Error())
 }
 
 func (jr *JobRunner) success(jobID string) {
 	logger.Info.Println("job completed: ", jobID)
 
-	jr.send("job:completed", jobID)
+	jr.send("frontend-build", "job:completed", jobID)
 }

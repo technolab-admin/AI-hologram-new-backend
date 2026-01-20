@@ -9,6 +9,7 @@ import (
 var knownClients = []string{
 	"backend-meshy",
 	"frontend-three",
+	"frontend-build",
 }
 
 var requiredFields = []string{

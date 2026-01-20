@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"time"
+	"strconv"
 	// "encoding/json"
 )
 
@@ -91,9 +92,21 @@ func (s *Service) waitUntilSucceeded(taskID string) error {
 
 		case "FAILED":
 			return errors.New("meshy task failed") // Change to logger function
+		
+		default:
+
+			err := s.wsClient.notifyFrontend(map[string]string{
+				"from":   "backend-meshy",
+				"target": "frontend-build",
+				"event":  "ui_notify_porgress",
+				"data":   strconv.Itoa(status.Progress),
+			})
+			if err != nil {
+				return err
+			}
 		}
+		
 
 		time.Sleep(2 * time.Second)
-
 	}
 }

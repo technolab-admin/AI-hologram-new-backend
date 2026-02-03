@@ -10,6 +10,9 @@ var knownClients = []string{
 	"backend-meshy",
 	"frontend-three",
 	"frontend-build",
+
+	"TEST-A",
+	"TEST-B",
 }
 
 var requiredFields = []string{

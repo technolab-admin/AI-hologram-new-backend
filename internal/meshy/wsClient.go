@@ -28,8 +28,8 @@ func (wsc *WSClient) StartWebsocketClient() {
 			continue
 		}
 
-		port := cfg.WebsocketAddr
-		url := fmt.Sprintf("ws://localhost%v/ws?id=%v", port, wsc.id)
+		websocketUrl := cfg.WebsocketURL
+		url := fmt.Sprintf("ws://%v/ws?id=%v", websocketUrl, wsc.id)
 
 		wsc.conn, _, err = websocket.DefaultDialer.Dial(url, nil)
 		if err != nil {

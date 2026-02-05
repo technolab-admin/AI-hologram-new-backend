@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  ai-hologram-backend:
+    build:
+      context: ./AI-hologram-new-backend
+    container_name: ai-hologram-backend
+    env_file:
+      - ./AI-hologram-new-backend/.env.docker
+    volumes:
+      - ./AI-hologram-new-backend/assets/downloads:/root/assets/downloads
+    ports:
+      - "${BACKEND_SERVER_PORT}:${BACKEND_SERVER_PORT}"
+      - "${WEBSOCKET_PORT}:${WEBSOCKET_PORT}"
+    restart: on-failure
+
+  ai-hologram-frontend:
+    build:
+      context: ./AI-HOLOGRAM-HARDWARE
+    container_name: ai-hologram-frontend
+    env_file:
+      - ./AI-HOLOGRAM-HARDWARE/.env.docker
+    ports:
+      - "${TOUCHSCREEN_GUI_PORT}:${TOUCHSCREEN_GUI_PORT}"
+    depends_on:
+      - ai-hologram-backend
+    restart: on-failure
+  
+  ollama:
+    build:
+      context: ./AI-HOLOGRAM-HARDWARE/ollama
+      dockerfile: Dockerfile.ollama
+    container_name: ollama
+    ports:
+      - "${OLLAMA_PORT}:${OLLAMA_PORT}"
+    env_file:
+      - .env
+    volumes:
+      - ollama_data:/root/.ollama
+      - ./AI-HOLOGRAM-HARDWARE/ollama/ollama-entrypoint.sh:/entrypoint.sh
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:11434" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  ollama_data:

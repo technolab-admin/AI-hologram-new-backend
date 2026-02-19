@@ -10,6 +10,9 @@ var knownClients = []string{
 	"backend-meshy",
 	"frontend-three",
 	"frontend-build",
+
+	"TEST-A",
+	"TEST-B",
 }
 
 var requiredFields = []string{
@@ -19,7 +22,8 @@ var requiredFields = []string{
 	"data",
 }
 
-func hasAllFields(msg map[string]string) error {
+
+func HasAllFields(msg map[string]string) error {
 
 	for _, field := range requiredFields {
 		val, exists := msg[field]
@@ -34,7 +38,8 @@ func hasAllFields(msg map[string]string) error {
 	return nil
 }
 
-func hasNoExtraFields(msgJson map[string]string) error {
+
+func HasNoExtraFields(msgJson map[string]string) error {
 
 	for field, _ := range msgJson {
 		if !slices.Contains(requiredFields, field) {
@@ -45,7 +50,7 @@ func hasNoExtraFields(msgJson map[string]string) error {
 	return nil
 }
 
-func isKnownClient(id string) bool {
+func IsKnownClient(id string) bool {
 
 	if slices.Contains(knownClients, id) {
 		return true
@@ -54,32 +59,33 @@ func isKnownClient(id string) bool {
 	return false
 }
 
-func vallidateClients(msg map[string]string) error {
+func VallidateClients(msg map[string]string) error {
 
 	fromId := msg["from"]
 	targetId := msg["target"]
 
-	if !isKnownClient(fromId) {
+	if !IsKnownClient(fromId) {
 		return fmt.Errorf("Unknown from client id: %v", fromId)
 	}
-	if !isKnownClient(targetId) {
+	if !IsKnownClient(targetId) {
 		return fmt.Errorf("Unknown target client id: %v", targetId)
 	}
 
 	return nil
 }
 
-func vallidateMsg(msg map[string]string) error {
+func VallidateMsg(msg map[string]string) error {
 
-	if err := hasAllFields(msg); err != nil {
+	if err := HasAllFields(msg); err != nil {
 		return err
 	}
-	if err := hasNoExtraFields(msg); err != nil {
+	if err := HasNoExtraFields(msg); err != nil {
 		return err
 	}
-	if err := vallidateClients(msg); err != nil {
+	if err := VallidateClients(msg); err != nil {
 		return err
 	}
 
 	return nil
 }
+

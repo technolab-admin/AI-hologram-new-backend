@@ -1,14 +1,18 @@
 package websockets
 
-import "github.com/gorilla/websocket"
+type WSConn interface { // This replaces *websocket.Conn to make testing more scalable
+    ReadMessage() (int, []byte, error)
+    WriteMessage(int, []byte) error
+    Close() error
+}
 
 type Client struct {
 	id      string
-	conn    *websocket.Conn
+	conn    WSConn
 	receive chan []byte
 }
 
-func NewClient(id string, conn *websocket.Conn) *Client {
+func NewClient(id string, conn WSConn) *Client {
 
 	c := Client{
 		id:      id,

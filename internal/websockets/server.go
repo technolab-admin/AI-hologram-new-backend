@@ -16,6 +16,43 @@ type Server struct {
 	upgrader websocket.Upgrader
 }
 
+
+func (s *Server) Start() error {
+
+	log.Printf("WebSocket server started on port %v\n", s.port)
+
+	err := http.ListenAndServe(s.port, nil)
+	if err != nil {
+		return fmt.Errorf("Error starting server: %v\n", err)
+	}
+	return nil
+}
+
+
+func (s *Server) MessageHandler(clientId string) {
+    s.messageHandler(clientId)
+}
+
+func (s *Server) Listener(clientId string) {
+    s.listener(clientId)
+}
+
+func (s *Server) AddClient(client *Client) {
+	s.mutex.Lock()
+	s.clients[client.id] = client
+	s.mutex.Unlock()
+}
+
+
+func (s *Server) GetNClients() int {
+	s.mutex.Lock()
+	n := len(s.clients)
+	s.mutex.Unlock()
+	return n
+}
+
+
+
 func NewServer(port string) *Server {
 
 	s := Server{
@@ -51,7 +88,7 @@ func (s *Server) messageHandler(clientId string) {
 			continue
 		}
 
-		if err = vallidateMsg(msg); err != nil {
+		if err = VallidateMsg(msg); err != nil {
 			log.Printf("Client %v Error: Validating message: %v\n", clientId, err) // Change to logger function
 			continue
 		}
@@ -110,7 +147,7 @@ func (s *Server) wsHandler(w http.ResponseWriter, r *http.Request) {
 
 	clientId := r.URL.Query().Get("id")
 
-	if !isKnownClient(clientId) {
+	if !IsKnownClient(clientId) {
 		log.Printf("Error: Client %v failed to connect: Client is unknown\n", clientId)
 		conn.Close()
 		return
@@ -119,21 +156,10 @@ func (s *Server) wsHandler(w http.ResponseWriter, r *http.Request) {
 	client := NewClient(clientId, conn)
 	log.Printf("Client %v connected\n", client.id)
 
-	s.mutex.Lock()
-	s.clients[client.id] = client
-	s.mutex.Unlock()
+	s.AddClient(client)
 
 	go s.listener(client.id)
 	go s.messageHandler(client.id)
 }
 
-func (s *Server) Start() error {
 
-	log.Printf("WebSocket server started on port %v\n", s.port)
-
-	err := http.ListenAndServe(s.port, nil)
-	if err != nil {
-		return fmt.Errorf("Error starting server: %v\n", err)
-	}
-	return nil
-}

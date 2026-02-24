@@ -6,7 +6,7 @@ services:
       context: ./AI-hologram-new-backend
     container_name: ai-hologram-backend
     env_file:
-      - ./AI-hologram-new-backend/.env.docker
+      - ./AI-hologram-new-backend/.env
     volumes:
       - ./AI-hologram-new-backend/assets/downloads:/root/assets/downloads
     ports:
@@ -19,7 +19,7 @@ services:
       context: ./AI-HOLOGRAM-HARDWARE
     container_name: ai-hologram-frontend
     env_file:
-      - ./AI-HOLOGRAM-HARDWARE/.env.docker
+      - ./AI-HOLOGRAM-HARDWARE/.env
     ports:
       - "${TOUCHSCREEN_GUI_PORT}:${TOUCHSCREEN_GUI_PORT}"
     depends_on:

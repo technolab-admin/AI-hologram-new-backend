@@ -16,8 +16,11 @@ type Client struct {
 	http    *http.Client
 }
 
-func NewClient(apiKey string, baseURL string) *Client {
-	return &Client{APIKey: apiKey, BaseURL: baseURL, http: &http.Client{}}
+func NewClient(apiKey string, baseURL string, httpClient *http.Client) *Client {
+	if httpClient == nil {
+		httpClient = &http.Client{}
+	}
+	return &Client{APIKey: apiKey, BaseURL: baseURL, http: httpClient}
 }
 
 func (c *Client) CreatePreviewJob(req *TextTo3DRequest) (*MeshyResponse, error) {
@@ -42,7 +45,7 @@ func (c *Client) CreateJob(url string, payload any) (*MeshyResponse, error) {
 	httpReq.Header.Set("Authorization", "Bearer "+c.APIKey)
 	httpReq.Header.Set("Content-Type", "application/json")
 
-	res, err := http.DefaultClient.Do(httpReq)
+	res, err := c.http.Do(httpReq)
 	if err != nil {
 		return nil, err
 	}

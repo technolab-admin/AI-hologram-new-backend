@@ -23,7 +23,7 @@ func NewRouter(cfg *config.Config, wsClient *meshy.WSClient) http.Handler {
 
 	r.Use(handlers.CORSMiddleware)
 
-	meshyClient := meshy.NewClient(cfg.MeshyAPIKey, cfg.MeshyAPIAdress)
+	meshyClient := meshy.NewClient(cfg.MeshyAPIKey, cfg.MeshyAPIAdress, nil)
 	jobRunner := meshy.NewJobRunner(meshyClient, wsClient)
 	httpHandler := handlers.NewHttpHandler(jobRunner)
 

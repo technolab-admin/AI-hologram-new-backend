@@ -9,11 +9,15 @@ import (
 	"github.com/google/uuid"
 )
 
-type HttpHandler struct {
-	jobRunner *meshy.JobRunner
+type JobRunner interface {
+	Run(id string, req *meshy.TextTo3DRequest)
 }
 
-func NewHttpHandler(jobRunner *meshy.JobRunner) *HttpHandler {
+type HttpHandler struct {
+	jobRunner JobRunner
+}
+
+func NewHttpHandler(jobRunner JobRunner) *HttpHandler {
 	return &HttpHandler{jobRunner: jobRunner}
 }
 

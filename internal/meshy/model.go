@@ -6,6 +6,7 @@ type TextTo3DRequest struct {
 	Mode         string `json:"mode"`
 	Prompt       string `json:"prompt"`
 	ShouldRemesh bool   `json:"shouldRemesh"`
+	Moderation	 bool	`json:"moderation"`
 }
 
 type MeshyResponse struct {
